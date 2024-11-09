@@ -1,0 +1,37 @@
+// Purpose: Ignore files and directories in git
+
+
+/node_modules
+/.pnp
+.pnp.js
+/expressbites.pem
+
+# testing
+/coverage
+
+# production
+/build
+
+# misc
+.DS_Store
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+
+
+
+version: 0.2
+phases:
+    build:
+        commands:
+            - npm install --save
+artifacts:
+    files:
+        - '**/*'

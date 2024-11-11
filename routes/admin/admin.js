@@ -12,8 +12,8 @@ const { addProperty,getPropertyById, updateProperty, getProperties, deleteProper
 
 //  Admin Routes
 
-router.get('/', getProperties);
-router.get('/:id', getPropertyById);
+router.get('/all', getProperties);
+router.get('/one/:id', getPropertyById);
 router.post('/add', authenticationMiddleware, upload.array('images', 10) , addProperty);
 router.put('/update/one/:id', authenticationMiddleware, upload.array('images', 10), updateProperty);
 router.delete('/delete/one/:id',  authenticationMiddleware,  deleteProperty);

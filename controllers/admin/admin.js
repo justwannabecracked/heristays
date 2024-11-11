@@ -49,7 +49,7 @@ const addProperty = async (req, res) => {
                     folder: 'Heristays Properties',
                 });
 
-                return result.url; // Save the URL of each uploaded image
+                return result; // Save the URL of each uploaded image
             })
         );
 
@@ -145,6 +145,12 @@ const getProperties = async (req, res) => {
 const getPropertyById = async (req, res) => {
     try {
         const property = await Property.findById(req.params.id).populate({ path: 'created_by', model: 'User' });
+        if (!property) {
+            return res.status(404).json({
+                msg: 'Property not found',
+                status: false
+            });
+        }
         res.status(200).json({
             msg: 'Property Fetched Successfully',
             status: true,
@@ -230,7 +236,7 @@ const updateProperty = async (req, res) => {
                             folder: 'Heristays Properties',
                         });
 
-                        return { url: result.url, public_id: result.public_id }; // Save both URL and public_id
+                        return { result}; // Save both URL and public_id
                     })
                 );
 
@@ -263,6 +269,16 @@ const updateProperty = async (req, res) => {
 
 const deleteProperty = async (req, res) => {
     try {
+
+        const { role } = req.user;
+        if (role === 'regular') {
+            return res.status(401).json({
+                msg: 'Unauthorized Access, Admins Only!',
+                status: false
+            });
+        }
+
+
         const deleted = await Property.findByIdAndDelete({ _id: req.params.id });        
         if (!deleted) {
             return res.status(400).json({

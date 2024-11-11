@@ -33,7 +33,7 @@ const propertySchema = new mongoose.Schema(
             default: 'available',
         },
         images: {
-            type: [String],
+            type: Array,
             required: [true, 'Upload at least one Image of the Property'],
         },
         guestCapacity: {

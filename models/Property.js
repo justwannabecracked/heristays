@@ -76,6 +76,46 @@ const propertySchema = new mongoose.Schema(
             type: mongoose.Schema.ObjectId,
             ref: 'User',
         },
+        bookings: [
+            {
+                checkIn: {
+                    type: Date,
+                    required: [true, 'Enter the Check-In Date'],
+                },
+                checkOut: {
+                    type: Date,
+                    required: [true, 'Enter the Check-Out Date'],
+                },
+                guests: {
+                    type: Number,
+                    required: [true, 'Enter the Number of Guests'],
+                },
+                date: {
+                    type: Date,
+                    default: Date.now,
+                },
+            },
+        ],
+        // reviews: [
+        //     {
+        //         user: {
+        //             type: mongoose.Schema.ObjectId,
+        //             ref: 'User',
+        //         },
+        //         review: {
+        //             type: String,
+        //             required: [true, 'Enter the Review of the Property'],
+        //         },
+        //         rating: {
+        //             type: Number,
+        //             required: [true, 'Enter the Rating of the Property'],
+        //         },
+        //         date: {
+        //             type: Date,
+        //             default: Date.now,
+        //         },
+        //     },
+        // ],
     },
     { timestamps: true }
 );

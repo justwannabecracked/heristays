@@ -18,8 +18,8 @@ const addProperty = async (req, res) => {
             });
         }
 
-        const { title, description, price, location, propertyType, guestCapacity, bedrooms, privateBed, minimumNights, maximumNights, amenities } = req.body;
-        if (!title || !description || !price || !location || !propertyType || !guestCapacity || !privateBed || !bedrooms || !minimumNights || !maximumNights || !amenities) {
+        const { title, description, price, location, propertyType, guestCapacity, bedrooms, privateBed, minimumNights, maximumNights, amenities, checkin, checkout } = req.body;
+        if (!title || !description || !price || !location || !propertyType || !guestCapacity || !privateBed || !bedrooms || !minimumNights || !maximumNights || !amenities || !checkin || !checkout) {
             return res.status(400).json({
                 message: 'Kindly Enter all Fields',
                 status: false
@@ -66,7 +66,13 @@ const addProperty = async (req, res) => {
             maximumNights,
             images: uploadedImages, // Save array of image URLs
             amenities: amenitiesArray,
-            created_by: req.user.id
+            created_by: req.user.id,
+            bookings:{
+                checkin,
+                checkout,
+                guest: guestCapacity
+            }
+
         });
 
         const newProperty = await Property.create(property);

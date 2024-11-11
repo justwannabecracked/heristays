@@ -21,7 +21,7 @@ const startPaymentCard = async (req, res) => {
 
 
         const random = helper.generateOTP();
-        const ref = `res-${random}-${id}`;
+        const ref = `heristays-${random}-${id}`;
         const transaction = await Transaction.create({
             created_by: id,
             reference: ref,
@@ -159,6 +159,10 @@ const verifyPayment = async (req, res) => {
                 user_card_info: event.data.authorization,
                 created_by: user._id,
             });
+
+            await order.save();
+
+
 
             console.log(`Booking ${order.order_num} was successful`);
 

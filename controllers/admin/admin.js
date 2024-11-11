@@ -266,7 +266,6 @@ const updateProperty = async (req, res) => {
 };
 
 
-
 const deleteProperty = async (req, res) => {
     try {
 
@@ -296,8 +295,8 @@ const deleteProperty = async (req, res) => {
             msg: err.message,
             status: false
         });
-    }};
+}};
 
 
-    module.exports = { addProperty, getProperties, getPropertyById, updateProperty, deleteProperty };
+module.exports = { addProperty, getProperties, getPropertyById, updateProperty, deleteProperty };
 

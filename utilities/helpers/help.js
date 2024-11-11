@@ -1,5 +1,4 @@
 const axios = require('axios'); // axios import...
-const encode = require('node-base64-image').encode; // base64 image encoder...
 
 
 // generate random  6 digit string...
@@ -8,17 +7,7 @@ exports.generateOTP = () => {
 };
 
 // generate encoded data:base64 url string...
-exports.convertBase = async (url) => {
-    const ans = `${url}`;
-    const options = {
-        string: true,
-        headers: {
-            'User-Agent': 'my-app',
-        },
-    };
-    const img = await encode(ans, options);
-    return img;
-};
+
 
 
 // termii send sms to phone numbers...

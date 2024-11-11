@@ -37,7 +37,14 @@ app.get('/', (req, res) => {
 });
 
 // Routes
+// Authentication routes
+app.use('/api/v1/auth', require('../routes/user/auth'));
 
+// Admin Dashboard routes
+app.use('/api/v1/property', require('../routes/admin/admin'));
+
+
+// Error handling middleware
 app.use(notFound);
 app.use(errorHandler);
 

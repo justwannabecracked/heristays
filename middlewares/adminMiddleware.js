@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 const authenticationMiddleware = async (req, res, next) => {
-    const token = req.header('expressbites');
+    const token = req.header('heri-auth-token');
 
     if (!token) {
         return res.status(401).json({

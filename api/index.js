@@ -1,9 +1,11 @@
 /* eslint-disable no-unused-vars */
 require('dotenv').config();
 const express = require('express');
+const session = require('express-session');
 const cors = require('cors');
 const helmet = require('helmet');
 const listEndPoints = require('list_end_points');
+const passport = require('../controllers/user/ssoAuthController');
 const connectDB = require('../config/db');
 const notFound = require('../middlewares/not-found');
 const errorHandler = require('../middlewares/error-handler');
@@ -22,6 +24,18 @@ app.use(helmet());
 app.use(cors());
 app.use(morgan('combined'));
 
+// Express session middleware
+// Configure session middleware
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true
+}));
+
+// Initialize Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 //root route
 app.get('/', (req, res) => {
@@ -39,6 +53,9 @@ app.get('/', (req, res) => {
 // Routes
 // Authentication routes
 app.use('/api/v1/auth', require('../routes/user/auth'));
+
+//Google and Facebook SSO routes
+app.use('/api/v1', require('../routes/user/authsso'));
 
 // Admin Dashboard routes
 app.use('/api/v1/property', require('../routes/admin/admin'));

@@ -6,12 +6,13 @@ const loginSchema = require('../../utilities/validationSchema/Login');
 // Middleware to validate request body using Joi
 const validation = require('../../utilities/validator');
 
-const { register, login, refreshUser} = require('../../controllers/user/authController');
+const { register, login, refreshUser, searchProperties} = require('../../controllers/user/authController');
 
 //User Routes
 router.post('/register', validation.validateBody(registerSchema), register);
 router.post('/login', validation.validateBody(loginSchema), login);
 router.get('/user', authenticationMiddleware, refreshUser);
+router.get('/search',  searchProperties);
 
 
 module.exports = router;

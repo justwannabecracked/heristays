@@ -1,13 +1,16 @@
 const axios = require('axios'); // axios import...
 
+// generate jwt token...
+exports.generateRefreshToken = function(user) {
+    return jwt.sign({ id: user.id , username: user.username, fullname: user.fullname, email: user.email, role: user.role,}, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_LIFETIME // Longer expiration for refresh token
+    });
+}
 
 // generate random  6 digit string...
 exports.generateOTP = () => {
     return Math.floor(1000 + Math.random() * 9000);
 };
-
-// generate encoded data:base64 url string...
-
 
 
 // termii send sms to phone numbers...

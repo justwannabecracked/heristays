@@ -78,17 +78,14 @@ const propertySchema = new mongoose.Schema(
         },
         bookings: [
             {
-                checkIn: {
+                checkin: {
                     type: Date,
-                    required: [true, 'Enter the Check-In Date'],
                 },
-                checkOut: {
+                checkout: {
                     type: Date,
-                    required: [true, 'Enter the Check-Out Date'],
                 },
                 guests: {
                     type: Number,
-                    required: [true, 'Enter the Number of Guests'],
                 },
                 date: {
                     type: Date,

@@ -70,7 +70,7 @@ const addProperty = async (req, res) => {
             bookings:{
                 checkin,
                 checkout,
-                guest: guestCapacity
+                guests: guestCapacity
             }
 
         });
@@ -89,7 +89,6 @@ const addProperty = async (req, res) => {
         });
     }
 };
-
 
 const getProperties = async (req, res) => {
     const { title, amenities, price, location, propertyType, page, limit } = req.query;

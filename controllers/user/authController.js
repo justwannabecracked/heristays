@@ -2,6 +2,7 @@ require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../../models/User');
+const Property = require('../../models/Property');
 
 // @desc    Register a new user
 // @route   POST /api/v1/auth/register
@@ -180,6 +181,76 @@ const refreshUser = async (req, res) => {
     }
 };
 
+const searchProperties = async (req, res) => {
+    try {
+        const { location, checkin, checkout, guests, limit = 10, page = 1 } = req.query;
+
+        // Validate required parameters
+        if (!location || !checkin || !checkout || !guests) {
+            return res.status(400).json({
+                message: 'Please provide location, checkin, checkout, and number of guests'
+            });
+        }
+
+        const checkInDate = new Date(checkin);
+        const checkOutDate = new Date(checkout);
+
+        // Pagination settings
+        const pageLimit = parseInt(limit, 10);
+        const skip = (parseInt(page, 10) - 1) * pageLimit;
+
+        // Query to find available properties
+        const properties = await Property.find({
+            location: location,
+            guestCapacity: { $gte: guests },
+            status: 'available',
+            bookings: {
+                $not: {
+                    $elemMatch: {
+                        $or: [
+                            { checkIn: { $lt: checkOutDate }, checkOut: { $gt: checkInDate } }
+                        ]
+                    }
+                }
+            }
+        })
+        .skip(skip)
+        .limit(pageLimit);
+
+        // Count total results for pagination
+        const totalResults = await Property.countDocuments({
+            location: location,
+            guestCapacity: { $gte: guests },
+            status: 'available',
+            bookings: {
+                $not: {
+                    $elemMatch: {
+                        $or: [
+                            { checkIn: { $lt: checkOutDate }, checkOut: { $gt: checkInDate } }
+                        ]
+                    }
+                }
+            }
+        });
+
+        // Calculate total pages
+        const totalPages = Math.ceil(totalResults / pageLimit);
+
+        res.status(200).json({
+            message: 'Properties found',
+            data: {
+                properties,
+                totalResults,
+                totalPages,
+                currentPage: parseInt(page, 10),
+                pageLimit
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
 
 
-module.exports = { register, login , refreshUser};
+module.exports = { register, login , refreshUser, searchProperties };
+

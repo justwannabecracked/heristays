@@ -10,6 +10,8 @@ const connectDB = require('../config/db');
 const notFound = require('../middlewares/not-found');
 const errorHandler = require('../middlewares/error-handler');
 const morgan = require('morgan');
+const allowedOrigins = ['https://drumroll-test.vercel.app', 'http://localhost:5173'];
+
 
 
 connectDB();
@@ -21,7 +23,17 @@ app.set('trust proxy', 1);
 
 app.use(express.json({ limit: '10mb' }));
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true // This allows cookies and session headers to be sent across the origins
+}));
 app.use(morgan('combined'));
 
 // Express session middleware

@@ -1,5 +1,9 @@
-const Property = require('../../models/Property');
 
+const Property = require('../../models/Property'); // Adjust the path to your models folder
+const Booking = require('../../models/Booking');
+const mongoose = require('mongoose');
+// const User = require('../../models/User');
+const Transaction = require('../../models/Transaction');
 const cloudinary = require('cloudinary').v2;
 
 cloudinary.config({
@@ -303,5 +307,62 @@ const deleteProperty = async (req, res) => {
 }};
 
 
-module.exports = { addProperty, getProperties, getPropertyById, updateProperty, deleteProperty };
+const dashboardSummary = async (req, res) => {
+    const { id } = req.user;
+
+    try {
+        // Total bookings
+        const totalBookings = await Booking.aggregate([
+            {
+                $match: {
+                    'booking_info.created_by._id': id,
+                },
+            },
+    
+        ]);
+
+        // Total properties
+        const totalProperties = await Property.countDocuments({
+            created_by: id,
+        });
+
+        // Available properties (not fully booked)
+        const availableProperties = await Property.countDocuments({ status: 'available', created_by: id });
+
+
+        // Revenue generated calculation
+        const revenueGenerated = await Transaction.aggregate([
+            {
+                $match: {
+                    'paystack_response.status': 'success',
+                    'paystack_response.metadata.booking.created_by._id': id,
+                },
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalRevenue: { $sum: '$paystack_response.amount' },
+                },
+            },
+        ]);
+
+        return res.status(200).json({
+            msg: 'Dashboard Summary',
+            status: true,
+            data: {
+                totalBookings,
+                totalProperties,
+                availableProperties,
+                revenueGenerated: revenueGenerated[0]?.totalRevenue || 0,
+            },
+        });
+    } catch (err) {
+        res.status(500).json({
+            msg: err.message,
+            status: false,
+        });
+    }
+};
+
+module.exports = { addProperty, getProperties, getPropertyById, updateProperty, deleteProperty, dashboardSummary };
 

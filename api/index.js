@@ -21,7 +21,7 @@ const app = express();
 const server = http.createServer(app); // Create an HTTP server with Express
 const io = new Server(server, {
     cors: {
-        origin: allowedOrigins,
+        origin: '*',
         methods: ["GET", "POST", "PUT", "DELETE"],
     }
 }); // Set up Socket.IO server with CORS

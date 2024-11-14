@@ -82,8 +82,14 @@ const addProperty = async (req, res) => {
 
         const newProperty = await Property.create(property);
         await newProperty.save();
+        
+        io.on('connection', (socket) => {
+            socket.on('propertyAdded', (data) => {
+                socket.broadcast.emit('property_added', data);
+            })
+        });
 
-        io.emit('propertyAdded', newProperty);
+
         res.status(200).send({
             msg: 'Property Added Successfully!',
             status: true
@@ -99,6 +105,8 @@ const addProperty = async (req, res) => {
 
 const getProperties = async (req, res) => {
     const io = req.app.get('socketio');
+    console.log(io);
+    
     const { title, amenities, price, location, propertyType, page, limit } = req.query;
     const queryObject = {};
 
@@ -135,7 +143,7 @@ const getProperties = async (req, res) => {
             .limit(limits);
 
 
-        io.emit('propertiesFetched', property);
+
         res.status(200).json({
             msg: 'Property Fetched Successfully',
             status: true,
@@ -167,7 +175,6 @@ const getPropertyById = async (req, res) => {
                 status: false
             });
         }
-        io.emit('propertyFetched', property);
         return res.status(200).json({
             msg: 'Property Fetched Successfully',
             status: true,
@@ -269,7 +276,11 @@ const updateProperty = async (req, res) => {
         // Save the updated property
         await property.save();
 
-        io.emit('propertyUpdated', property);
+                io.on('connection', (socket) => {
+            socket.on('propertyUpdated', (data) => {
+                socket.broadcast.emit('property_updated', data);
+            })
+        });
 
         res.status(200).json({
             msg: 'Property updated successfully',
@@ -309,7 +320,19 @@ const deleteProperty = async (req, res) => {
             });
         }
 
-        io.emit('propertyDeleted', deleted);
+        // Delete images from Cloudinary
+        await Promise.all(
+            deleted.images.map(async (image) => {
+                await cloudinary.uploader.destroy(image.public_id);
+            }
+        ));
+
+         io.on('connection', (socket) => {
+            socket.on('propertyDeleted', (data) => {
+                socket.broadcast.emit('property_deleted', data);
+            })
+        });
+
         return res.status(200).send({
             msg: 'Property Deleted Successfully!',
             status: true

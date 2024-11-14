@@ -65,7 +65,6 @@ io.on('connection', (socket) => {
     });
 });
 
-
 //root route
 app.get('/', (req, res) => {
     res.send({
@@ -110,5 +109,5 @@ listEndPoints.default(app); //lists all endpoints on the console...
 
 const PORT = process.env.PORT;
 
-app.listen(PORT, () => console.log(`server running on port ${PORT}`));
+server.listen(PORT, () => console.log(`server running on port ${PORT}`));
 

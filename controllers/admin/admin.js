@@ -89,9 +89,6 @@ const addProperty = async (req, res) => {
             })
         });
  
-        console.log(newProperty);
- 
- 
  
         res.status(200).send({
             msg: 'Property Added Successfully!',
@@ -166,7 +163,7 @@ const getProperties = async (req, res) => {
 };
  
  
- 
+
 const getPropertyById = async (req, res) => {
     try {
         const property = await Property.findById(req.params.id).populate({ path: 'created_by', model: 'User' });
@@ -333,7 +330,6 @@ const deleteProperty = async (req, res) => {
             })
         });
  
-        console.log(id);
  
  
         return res.status(200).send({

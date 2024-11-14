@@ -104,8 +104,6 @@ const addProperty = async (req, res) => {
 };
 
 const getProperties = async (req, res) => {
-    const io = req.app.get('socketio');
-    console.log(io);
     
     const { title, amenities, price, location, propertyType, page, limit } = req.query;
     const queryObject = {};
@@ -166,7 +164,6 @@ const getProperties = async (req, res) => {
 
 
 const getPropertyById = async (req, res) => {
-    const io = req.app.get('socketio');
     try {
         const property = await Property.findById(req.params.id).populate({ path: 'created_by', model: 'User' });
         if (!property) {

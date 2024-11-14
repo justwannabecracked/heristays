@@ -1,7 +1,6 @@
 
 const Property = require('../../models/Property'); // Adjust the path to your models folder
 const Booking = require('../../models/Booking');
-const mongoose = require('mongoose');
 // const User = require('../../models/User');
 const Transaction = require('../../models/Transaction');
 const cloudinary = require('cloudinary').v2;

@@ -66,6 +66,9 @@ app.get('/', (req, res) => {
 // Authentication routes
 app.use('/api/v1/auth', require('../routes/user/auth'));
 
+// Booking routes
+app.use('/api/v1/booking', require('../routes/booking/books'));
+
 //Google and Facebook SSO routes
 app.use('/api/v1', require('../routes/user/authsso'));
 

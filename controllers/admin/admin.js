@@ -5,6 +5,7 @@ const Booking = require('../../models/Booking');
 const Transaction = require('../../models/Transaction');
 const cloudinary = require('cloudinary').v2;
 
+
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_NAME,
     api_key: process.env.CLOUDINARY_APIKEY,
@@ -12,6 +13,7 @@ cloudinary.config({
 });
 
 const addProperty = async (req, res) => {
+    const io = req.app.get('socketio');
     try {
         const { role } = req.user;
         if (role === 'regular') {
@@ -80,6 +82,8 @@ const addProperty = async (req, res) => {
 
         const newProperty = await Property.create(property);
         await newProperty.save();
+
+        io.emit('propertyAdded', newProperty);
         res.status(200).send({
             msg: 'Property Added Successfully!',
             status: true
@@ -94,6 +98,7 @@ const addProperty = async (req, res) => {
 };
 
 const getProperties = async (req, res) => {
+    const io = req.app.get('socketio');
     const { title, amenities, price, location, propertyType, page, limit } = req.query;
     const queryObject = {};
 
@@ -129,6 +134,8 @@ const getProperties = async (req, res) => {
             .skip(skip)
             .limit(limits);
 
+
+        io.emit('propertiesFetched', property);
         res.status(200).json({
             msg: 'Property Fetched Successfully',
             status: true,
@@ -151,6 +158,7 @@ const getProperties = async (req, res) => {
 
 
 const getPropertyById = async (req, res) => {
+    const io = req.app.get('socketio');
     try {
         const property = await Property.findById(req.params.id).populate({ path: 'created_by', model: 'User' });
         if (!property) {
@@ -159,7 +167,8 @@ const getPropertyById = async (req, res) => {
                 status: false
             });
         }
-        res.status(200).json({
+        io.emit('propertyFetched', property);
+        return res.status(200).json({
             msg: 'Property Fetched Successfully',
             status: true,
             data: property
@@ -174,6 +183,7 @@ const getPropertyById = async (req, res) => {
 };
 
 const updateProperty = async (req, res) => {
+        const io = req.app.get('socketio');
     try {
         const { role } = req.user;
         if (role === 'regular') {
@@ -259,6 +269,8 @@ const updateProperty = async (req, res) => {
         // Save the updated property
         await property.save();
 
+        io.emit('propertyUpdated', property);
+
         res.status(200).json({
             msg: 'Property updated successfully',
             status: true,
@@ -275,7 +287,8 @@ const updateProperty = async (req, res) => {
 
 
 const deleteProperty = async (req, res) => {
-    try {
+        const io = req.app.get('socketio');
+     try {
 
         const { role } = req.user;
         if (role === 'regular') {
@@ -284,6 +297,8 @@ const deleteProperty = async (req, res) => {
                 status: false
             });
         }
+
+        
 
 
         const deleted = await Property.findByIdAndDelete({ _id: req.params.id });        
@@ -294,6 +309,7 @@ const deleteProperty = async (req, res) => {
             });
         }
 
+        io.emit('propertyDeleted', deleted);
         return res.status(200).send({
             msg: 'Property Deleted Successfully!',
             status: true

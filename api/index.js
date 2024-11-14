@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
@@ -10,34 +9,41 @@ const connectDB = require('../config/db');
 const notFound = require('../middlewares/not-found');
 const errorHandler = require('../middlewares/error-handler');
 const morgan = require('morgan');
+const http = require('http'); // Import http module
+const { Server } = require('socket.io'); // Import Socket.IO
+
 const allowedOrigins = ['https://drumroll-test.vercel.app', 'http://localhost:5173'];
 
-
-
+// Connect to the database
 connectDB();
-const app = express();
 
-// We are using this for the express-rate-limit middleware
-// app.enable('trust proxy');
+const app = express();
+const server = http.createServer(app); // Create an HTTP server with Express
+const io = new Server(server, {
+    cors: {
+        origin: allowedOrigins,
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        credentials: true
+    }
+}); // Set up Socket.IO server with CORS
+
 app.set('trust proxy', 1);
 
 app.use(express.json({ limit: '10mb' }));
 app.use(helmet());
 app.use(cors({
     origin: (origin, callback) => {
-        // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
         }
     },
-    credentials: true // This allows cookies and session headers to be sent across the origins
+    credentials: true
 }));
 app.use(morgan('combined'));
 
 // Express session middleware
-// Configure session middleware
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
@@ -47,6 +53,18 @@ app.use(session({
 // Initialize Passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Make Socket.IO accessible in routes and controllers
+app.set('socketio', io);
+
+// Socket.IO connection handling
+io.on('connection', (socket) => {
+    console.log('User connected:', socket.id);
+
+    socket.on('disconnect', () => {
+        console.log('User disconnected:', socket.id);
+    });
+});
 
 
 //root route

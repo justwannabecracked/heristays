@@ -44,6 +44,7 @@
     "paystack-api": "^2.0.6",
     "request": "^2.88.2",
     "rimraf": "^6.0.1",
+    "socket.io": "^4.8.1",
     "uuid": "^11.0.2"
   }
 }

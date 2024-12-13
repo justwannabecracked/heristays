@@ -125,6 +125,56 @@ const startPaymentTransfer = async (req, res) => {
 };
 
 
+const confirmTransaction = async (req, res) => {
+    try {   
+        const id = req.user.id;
+
+        const { reference } = req.query
+        if (!reference) {
+            return res.status(400).json({
+                status: false,
+                msg: 'Please provide reference',
+            });
+        }
+
+        const transaction = await Transaction
+            .findOne({ reference })
+            .populate('created_by', id)
+            .exec();
+
+        if (!transaction) {
+            return res.status(404).json({
+                status: false,
+                msg: 'Transaction not found',
+            });
+        }
+
+        const { status } = transaction;
+        if (status !== 'success') {
+            return res.status(400).json({
+                msg: 'Transaction not successful',
+                status: false,
+            });
+        }
+
+
+        return res.status(200).json({
+            msg: 'Transaction successful',
+            status: true,
+            data: transaction,
+        });
+          
+    } catch (err) {
+            res.status(500).json({
+            status: false,
+            msg: 'Server Error',
+            error: err.message,
+
+        });
+    }
+}
+
+
 const verifyPayment = async (req, res) => {
     // Validate event
     const hash = crypto.createHmac('sha512', secret).update(JSON.stringify(req.body)).digest('hex');
@@ -176,5 +226,6 @@ const verifyPayment = async (req, res) => {
 module.exports = {
     startPaymentCard,
     verifyPayment,
+    confirmTransaction,
     startPaymentTransfer,
 };
